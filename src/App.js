@@ -1,24 +1,38 @@
-import logo from './logo.svg';
 import './App.css';
+import Login from './pages/Login';
+import HomePage from './pages/HomePage';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const code = new URLSearchParams(window.location.search).get('code')
 
 function App() {
+
+  const [token, setToken] = useState('');
+
+  useEffect(() => {
+
+    async function getToken() {
+
+      axios.get('/auth/getToken', {
+        headers: {
+            'code': code,
+        }
+      }).then(function (response) {
+        const json = response.json();
+        setToken(json.access_token);
+      });
+    }
+
+    getToken();
+
+  }, []);
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+        { (token === '') ? <Login/> : <HomePage token={token} /> }
+    </>
   );
 }
 
